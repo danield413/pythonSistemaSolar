@@ -38,6 +38,7 @@ def generarSistema():
         y = i["posicionY1"]
         x2 = i["posicionX2"]
         y2 = i["posicionY2"]
+        # Se agrega al árbol
         arbolSistema.agregar(Nodo(codigo, nombre, material, cantidad, x, y, x2, y2))
 
     generarMateriales()

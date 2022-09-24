@@ -3,6 +3,7 @@ import time
 class Nodo:
 
     def __init__(self, codigo, nombre, material, cantidad, x, y, x2, y2):
+        self.vecesVisitado = 0
         self.izquierda = None
         self.derecha = None
         self.codigo = codigo
@@ -14,10 +15,13 @@ class Nodo:
         self.coordenadaX2 = x2
         self.coordenadaY2 = y2
 
+    def setVecesVisitado(self):
+        self.vecesVisitado += 1
+
     def aumentarCantidad(self, canvas):
         self.cantidad += 2
         canvas.itemconfig(self.nombre, text=str( self.cantidad ))
-        canvas.after(2000, self.aumentarCantidad, canvas)
+        canvas.after(10000, self.aumentarCantidad, canvas)
 
     def getX(self):
         return self.coordenadaX1

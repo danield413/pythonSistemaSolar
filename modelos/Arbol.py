@@ -10,6 +10,7 @@ class Arbol:
     def resetLista(self):
         self.lista = []   
 
+
     def mostrarInOrden(self, temp):
         if(temp == None): return
         
