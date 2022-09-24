@@ -5,20 +5,23 @@ class Arbol:
         self.lista = []
 
     def getRaiz(self):
-        return self.raiz    
+        return self.raiz 
+
+    def resetLista(self):
+        self.lista = []   
 
     def mostrarInOrden(self, temp):
         if(temp == None): return
         
         self.mostrarInOrden(temp.getIzquierda())
-        self.lista.append(temp.getDato())
+        self.lista.append(temp)
         self.mostrarInOrden(temp.getDerecha())
         return self.lista
         
     def mostrarPreOrden(self, temp):
         if(temp == None): return
         
-        self.lista.append(temp.getDato())
+        self.lista.append(temp)
         self.mostrarPreOrden(temp.getIzquierda())
         self.mostrarPreOrden(temp.getDerecha())
         return self.lista
@@ -28,7 +31,7 @@ class Arbol:
         
         self.mostrarPostOrden(temp.getIzquierda())
         self.mostrarPostOrden(temp.getDerecha())
-        self.lista.append(temp.getDato())
+        self.lista.append(temp)
         return self.lista
 
     def numeroHojasArbol(self, temp):
