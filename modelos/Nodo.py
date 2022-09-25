@@ -1,5 +1,3 @@
-import time
-
 class Nodo:
 
     def __init__(self, codigo, nombre, material, cantidad, x, y, x2, y2):
@@ -22,6 +20,10 @@ class Nodo:
         self.cantidad += 2
         canvas.itemconfig(self.nombre, text=str( self.cantidad ))
         canvas.after(10000, self.aumentarCantidad, canvas)
+
+    def disminuirCantidad(self, valor, canvas):
+        self.cantidad -= valor
+        canvas.itemconfig(self.nombre, text=self.cantidad)
 
     def getInformacion(self):
         return "Nombre: {0} - Código: {1} - Material: {2} - Cantidad: {3}".format(self.nombre, self.codigo, self.material, self.cantidad)

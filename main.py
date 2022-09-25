@@ -1,15 +1,27 @@
 import random
-import threading
-import time
 from tkinter import *
+import threading
+
+from helpers.Helpers import Helpers
 from modelos.Arbol import Arbol
 from modelos.Nave import Nave
 from modelos.Nodo import Nodo
 from modelos.JSON import JSON
 
 arbolSistema = Arbol()
-nave = Nave(1)
+arbolMateriales = Arbol()
+nave = Nave(1, "blue")
+nave2 = Nave(2, "red")
+nave3 = Nave(3, "green")
+naves = [nave, nave2, nave3]
+#En milisegundos
+VELOCIDAD_NODOS = 250
+VELOCIDAD_SALIDA = 4000
 
+def reiniciarCapacidadNaves():
+    naves[0].setCapacidad(0)
+    naves[1].setCapacidad(0)
+    naves[2].setCapacidad(0)
 
 def generarMateriales():
     nodos = arbolSistema.mostrarInOrden(arbolSistema.getRaiz())
@@ -45,80 +57,98 @@ def generarSistema():
         arbolSistema.agregar(Nodo(codigo, nombre, material, cantidad, x, y, x2, y2))
 
     generarMateriales()
+    nave.cambiarRecorrido(arbolSistema)
+    nave2.cambiarRecorrido(arbolSistema)
+    nave3.cambiarRecorrido(arbolSistema)
 
 def enviarNaves():
-    
+
         proceso1 = empezarARecolectar('puntero')
-        # proceso2 = empezarARecolectar('puntero2')
-        # proceso3 = empezarARecolectar('puntero3')
+        # proceso2 = empezarARecolectar('puntero2', nave2)
+        # proceso3 = empezarARecolectar('puntero3', nave3)
 
         hilo1 = threading.Thread(name="HiloNave1",target=proceso1)
         # hilo2 = threading.Thread(name="HiloNave2",target=proceso2)
         # hilo3 = threading.Thread(name="HiloNave3",target=proceso3)
 
         hilo1.start()
-
         # hilo2.start()
         # hilo3.start()
 
+#? ciclo de salidas
 def empezarARecolectar(puntero): 
-    # cada 30 minutos verifica si puede despachar nave
-    numeroRandom = random.randint(1,3)
-    print("Recorrido asignado => ", numeroRandom)
-    recorrido = []
-    arbolSistema.resetLista()
-    if(numeroRandom == 1): recorrido = arbolSistema.mostrarInOrden(arbolSistema.getRaiz())
-    if(numeroRandom == 2): recorrido = arbolSistema.mostrarPreOrden(arbolSistema.getRaiz())
-    if(numeroRandom == 3): recorrido = arbolSistema.mostrarPostOrden(arbolSistema.getRaiz())
-    canvas.after(5000, despacharNave, 0, recorrido, len(recorrido)-1, puntero)
+    indexNave = random.randint(0,2)
+    if(naves[indexNave].getEnViaje() == False):
+        canvas.itemconfig(puntero, fill=naves[indexNave].getColor())
+        despacharNave(0, puntero, naves[indexNave])
+
+        canvas.after(20000, empezarARecolectar, puntero)
+
+#? salida de la nave
+def despacharNave(cont, puntero, naveActual):
+       
+    if(naveActual.getEnViaje() is False):
+        naveActual.setViaje(True)
         
-def lol():
-    print("llamada")
-    canvas.after(250, lol)
+        recolectar(cont, naveActual.getRecorrido(), len(naveActual.getRecorrido())-1, puntero, naveActual)
+        # canvas.after(4000, despacharNave, 0, puntero, naveActual)
+        return
 
-
-def despacharNave(cont, lista, length, puntero):
-    print("DESPACHAR NAVE")
-    if(nave.getEnViaje() is False):
-        nave.setViaje(True)
-        
-        # tarea = canvas.after(250, recolectar, cont+1, lista, length, puntero)
-        recolectar(cont, lista, length, puntero)
-        canvas.after(5000, despacharNave, 0, lista, len(lista)-1, puntero)
-
-
-def recolectar(cont, lista, length, puntero):
-    
-    tarea = canvas.after(250, recolectar, cont+1, lista, length, puntero)
+#? recoleccion de materiales en los planetas
+def recolectar(cont, lista, length, puntero, naveActual):
+    tarea = canvas.after(2000, recolectar, cont+1, lista, length, puntero, naveActual)
 
     if(cont >= length):
-        nave.setViaje(False)
-        print("La nave ya paró su viaje", str( nave.getEnViaje() ))
+        naveActual.setViaje(False)
+        Helpers.volver(puntero, canvas)
         canvas.after_cancel(tarea)
+        naveActual.cambiarRecorrido(arbolSistema)
+        return
 
     planetaActual = lista[cont]
-    print(planetaActual.getInformacion())
+    cantidadPlaneta = planetaActual.getCantidad()
+    capacidadNave = naveActual.getCapacidad()
+    restantesNave = 30 - capacidadNave
+    print(nave.getNumero(), "DISPONIBLE: ", restantesNave)
+    if(restantesNave < 31):
+        if(cantidadPlaneta < restantesNave):
+            #22 - 30
+            # print("quitó a")
+            planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
+            naveActual.setCapacidad(naveActual.getCapacidad() + cantidadPlaneta)
+
+        if(cantidadPlaneta > restantesNave):
+            #90 - 20
+            # 90 - (90-20)
+            # print("quitó b")
+            planetaActual.disminuirCantidad(cantidadPlaneta - (cantidadPlaneta - restantesNave), canvas)
+            naveActual.setCapacidad(naveActual.getCapacidad() + restantesNave )
+
+    if(restantesNave == 0 and cont >= length):
+        print("Nave devuelta a la base")
+        reiniciarCapacidadNaves()
+        naveActual.guardarAlmacenamiento()
+
     canvas.moveto(puntero, lista[cont].getX()-4, lista[cont].getY()-4)
-    
-    
-def volver(puntero):
-    if(puntero == "puntero"): canvas.moveto(puntero,0,0)
-    if(puntero == "puntero2"): canvas.moveto(puntero,40,0)
-    if(puntero == "puntero3"): canvas.moveto(puntero,80,0)
+    return
 
 #Ventana
 ventana = Tk()
-ventana.geometry("500x500")
+ventana.geometry("600x600")
 ventana.title("Proyecto Datos")
 Button(ventana, text="Generar sistema", foreground="white", background="black",  padx=5, pady=5, command=generarSistema, font=('Helvetica', 9, 'bold')).pack()
 Button(ventana, text="Recolectar", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold'), command=enviarNaves).pack()
+Button(ventana, text="Destruir", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold')).pack()
+Button(ventana, text="Ver arbol de materiales", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold')).pack()
 
 #Gráfico
-canvas = Canvas(ventana, width=400, height=400, bg='gray')
+canvas = Canvas(ventana, width=550, height=400, bg='gray')
 canvas.pack(expand=YES)
-canvas.create_oval(0,0, 40, 40, fill="blue", tags=['puntero'])
+canvas.create_oval(0,0, 40, 40, fill="gray", tags=['puntero'])
 # canvas.create_oval(40,0, 80, 40, fill="red", tags=['puntero2'])
 # canvas.create_oval(80,0, 120, 40, fill="green", tags=['puntero3'])
+canvas.create_text(50, 80, text="U/ en el almacén: 0")
+canvas.create_text(50, 100, text="Arbol de materiales: 0 nodos act.")
 
 
 mainloop()
