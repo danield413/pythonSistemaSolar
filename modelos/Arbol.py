@@ -1,3 +1,5 @@
+import random
+
 class Arbol:
 
     def __init__ (self):
@@ -10,6 +12,27 @@ class Arbol:
     def resetLista(self):
         self.lista = []   
 
+    # #? Determina que tipo de recorrido hará la nave (puntero)
+    # def hacerRecorrido(self, canvas, puntero):
+    #     print("ejecucion",puntero)
+    #     tipoRecorrido = random.randint(1,3)
+    #     self.resetLista()
+    #     if(tipoRecorrido == 1): self.mostrarInOrden(self.getRaiz())
+    #     if(tipoRecorrido == 2): self.mostrarPreOrden(self.getRaiz())
+    #     if(tipoRecorrido == 3): self.mostrarPostOrden(self.getRaiz())
+
+    #     self.recolectar(canvas, 0, puntero)
+
+    # #? nos permite recolectar los materiales mientra hacemos el recorrido seleccionado
+    # def recolectar(self, canvas, cont, puntero):
+    #     # print(cont, length)
+    #     if(cont <= len(self.lista)-1): 
+    #         canvas.moveto(puntero, self.lista[cont].getX()-4, self.lista[cont].getY()-4)
+
+    #     tarea = canvas.after(1000, self.recolectar, canvas, cont+1, puntero)
+    #     if(cont == len(self.lista)-1): 
+    #         canvas.after_cancel(tarea)
+    #         return
 
     def mostrarInOrden(self, temp):
         if(temp == None): return

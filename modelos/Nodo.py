@@ -23,6 +23,9 @@ class Nodo:
         canvas.itemconfig(self.nombre, text=str( self.cantidad ))
         canvas.after(10000, self.aumentarCantidad, canvas)
 
+    def getInformacion(self):
+        return "Nombre: {0} - Código: {1} - Material: {2} - Cantidad: {3}".format(self.nombre, self.codigo, self.material, self.cantidad)
+
     def getX(self):
         return self.coordenadaX1
 
