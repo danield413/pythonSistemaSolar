@@ -1,5 +1,3 @@
-import random
-
 class Arbol:
 
     def __init__ (self):

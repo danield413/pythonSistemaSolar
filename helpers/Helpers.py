@@ -32,14 +32,19 @@ class Helpers:
         naves[0].setCapacidadPlata(0)
         naves[0].setCapacidadBronce(0)
         naves[0].setCargaLlena(False)
+        naves[0].setViaje(False)
+        
         naves[1].setCapacidadOro(0)
         naves[1].setCapacidadPlata(0)
         naves[1].setCapacidadBronce(0)
         naves[1].setCargaLlena(False)
+        naves[1].setViaje(False)
+
         naves[2].setCapacidadOro(0)
         naves[2].setCapacidadPlata(0)
         naves[2].setCapacidadBronce(0)
         naves[2].setCargaLlena(False)
+        naves[2].setViaje(False)
 
         canvas.itemconfig('naveActual', text="Nave: ")
         canvas.itemconfig('oro', text="Oro: 0")

@@ -1,14 +1,16 @@
-from email.mime import image
 import random
 from tkinter import *
 import threading
 from helpers.Helpers import Helpers
 
+from modelos.Almacen import Almacen
 from modelos.Arbol import Arbol
 from modelos.Nave import Nave
 
 arbolSistema = Arbol()
 arbolMateriales = Arbol()
+almacen = Almacen()
+
 nave = Nave(1)
 nave2 = Nave(2)
 nave3 = Nave(3)
@@ -18,24 +20,38 @@ def generarSistema():
     Helpers.generarSistema(canvas, arbolSistema, naves)
 
 def enviarNaves():
-        proceso1 = empezarARecolectar('nave')
-        hilo1 = threading.Thread(name="HiloNave1",target=proceso1)
-        hilo1.start()
+    proceso1 = empezarARecolectar('nave')
+    hilo1 = threading.Thread(name="HiloNave1",target=proceso1)
+    hilo1.start()
+
+def guardarMaterialEnAlmacen(recoleccion):
+    print(recoleccion)
+    almacen.setOroAlmacenado(almacen.getOroAlmacenado() + recoleccion["oro"])
+    almacen.setPlataAlmacenada(almacen.getPlataAlmacenada() + recoleccion["plata"])
+    almacen.setBronceAlmacenado(almacen.getBronceAlmacenado() + recoleccion["bronce"])
+    print("ALMACEN ORO:", almacen.getOroAlmacenado())
+    print("ALMACEN PLATA:", almacen.getPlataAlmacenada())
+    print("ALMACEN BRONCE:", almacen.getBronceAlmacenado())
+    texto = "Unid. Almacén: " + str(almacen.getOroAlmacenado()+almacen.getPlataAlmacenada()+almacen.getBronceAlmacenado())
+    canvas.itemconfig('unidadesAlmacen', text=texto)
+    
+def finalizarRecorrido(naveActual, tarea):
+    Helpers.reiniciarRecorridoNave(naves, canvas)
+    naveActual.cambiarRecorrido(arbolSistema)
+    canvas.after_cancel(tarea)
 
 #? ciclo de salidas
 def empezarARecolectar(puntero): 
     indexNave = random.randint(0,2)
     if(naves[indexNave].getEnViaje() == False):
-        
         despacharNave(0, puntero, naves[indexNave])
         texto = "Nave: " + str(indexNave+1)
         canvas.itemconfig("naveActual", text=texto)
         print(">> Despacho: ", texto)
-        canvas.after(14000, empezarARecolectar, puntero)
+        canvas.after(4000, empezarARecolectar, puntero)
 
 #? salida de la nave
 def despacharNave(cont, puntero, naveActual):
-       
     if(naveActual.getEnViaje() is False):
         naveActual.setViaje(True)
         
@@ -43,7 +59,7 @@ def despacharNave(cont, puntero, naveActual):
         return
 
 def recolectar(cont, lista, length, puntero, naveActual):
-    tarea = canvas.after(1500, recolectar, cont+1, lista, length, puntero, naveActual)
+    tarea = canvas.after(300, recolectar, cont+1, lista, length, puntero, naveActual)
     canvas.moveto(puntero, lista[cont].getX()-4, lista[cont].getY()-4)
     planetaActual = lista[cont]
 
@@ -73,7 +89,7 @@ def recolectar(cont, lista, length, puntero, naveActual):
             texto = "Oro: " + str(naveActual.getCapacidadOro())
             canvas.itemconfig('oro', text=texto)
 
-        # #? puedo sacar plata
+    #? puedo sacar plata
     if(restantesPlata < 31 and planetaActual.getMaterial() == 'plata'):
         print("EXTRAIGO PLATA")
 
@@ -89,7 +105,7 @@ def recolectar(cont, lista, length, puntero, naveActual):
             texto = "Plata: " + str(naveActual.getCapacidadPlata())
             canvas.itemconfig('plata', text=texto)
 
-        #? puedo sacar bronce
+    #? puedo sacar bronce
     if(restantesBronce < 31 and planetaActual.getMaterial() == 'bronce'):
         print("EXTRAIGO BRONCE")
 
@@ -105,32 +121,30 @@ def recolectar(cont, lista, length, puntero, naveActual):
             texto = "Bronce: " + str(naveActual.getCapacidadBronce())
             canvas.itemconfig('bronce', text=texto)
 
+    recoleccion = {
+        "oro": naveActual.getCapacidadOro(),
+        "plata": naveActual.getCapacidadPlata(),
+        "bronce": naveActual.getCapacidadBronce()
+    }
+
     if(restantesOro == 0): 
         print(">>>>> ORO LLENO, DEVUELVE NAVE")
-        Helpers.reiniciarRecorridoNave(naves, canvas)
-        naveActual.cambiarRecorrido(arbolSistema)
-        canvas.after_cancel(tarea)
-        naveActual.setCargaLlena(True)
-        naveActual.setViaje(False)
+        guardarMaterialEnAlmacen(recoleccion)
+        finalizarRecorrido(naveActual, tarea)
 
     if(restantesPlata == 0): 
         print(">>>>> PLATA LLENO, DEVUELVE NAVE")
-        Helpers.reiniciarRecorridoNave(naves, canvas)
-        naveActual.cambiarRecorrido(arbolSistema)
-        canvas.after_cancel(tarea)
-        naveActual.setCargaLlena(True)
-        naveActual.setViaje(False)
+        guardarMaterialEnAlmacen(recoleccion)
+        finalizarRecorrido(naveActual, tarea)
         
     if(restantesBronce == 0): 
         print(">>>>> BRONCE LLENO, DEVUELVE NAVE")
-        Helpers.reiniciarRecorridoNave(naves, canvas)
-        naveActual.cambiarRecorrido(arbolSistema)
-        canvas.after_cancel(tarea)
-        naveActual.setCargaLlena(True)
-        naveActual.setViaje(False)
+        guardarMaterialEnAlmacen(recoleccion)
+        finalizarRecorrido(naveActual, tarea)
 
     if(cont == length):
         print("no logró llenar la capacidad")
+        guardarMaterialEnAlmacen(recoleccion)
         canvas.moveto(puntero, 40, 20)
         canvas.after_cancel(tarea)
         Helpers.reiniciarRecorridoNave(naves, canvas)
@@ -139,6 +153,7 @@ def recolectar(cont, lista, length, puntero, naveActual):
 ventana = Tk()
 ventana.geometry("600x600")
 ventana.title("Proyecto Datos")
+ventana.configure(background="black")
 Button(ventana, text="Generar sistema", foreground="white", background="black",  padx=5, pady=5, command=generarSistema, font=('Helvetica', 9, 'bold')).pack()
 Button(ventana, text="Recolectar", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold'), command=enviarNaves).pack()
 Button(ventana, text="Destruir", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold')).pack()
@@ -154,7 +169,7 @@ canvas.create_text(40, 60, text="Nave: ", tags=["naveActual"], font=('Helvetica'
 canvas.create_text(40, 80, text="Oro: 0", tags=["oro"], font=('Helvetica', 9, 'bold'), fill="white")
 canvas.create_text(40, 100, text="Plata: 0", tags=["plata"], font=('Helvetica', 9, 'bold'), fill="white")
 canvas.create_text(40, 120, text="Bronce: 0", tags=["bronce"], font=('Helvetica', 9, 'bold'), fill="white")
-canvas.create_text(50, 140, text="Unid. Almacén: 0", tags=["unidadesAlmacen"], font=('Helvetica', 9, 'bold'), fill="white")
-canvas.create_text(50, 160, text="Arb Mat. Nodos: 0", tags=["nodosAlmacen"], font=('Helvetica', 9, 'bold'), fill="white")
+canvas.create_text(450, 140, text="Unid. Almacén: 0", tags=["unidadesAlmacen"], font=('Helvetica', 9, 'bold'), fill="white")
+canvas.create_text(450, 160, text="Arb Mat. Nodos: 0", tags=["nodosArbolMateriales"], font=('Helvetica', 9, 'bold'), fill="white")
 
 mainloop()
