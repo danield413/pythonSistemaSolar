@@ -12,28 +12,6 @@ class Arbol:
     def resetLista(self):
         self.lista = []   
 
-    # #? Determina que tipo de recorrido hará la nave (puntero)
-    # def hacerRecorrido(self, canvas, puntero):
-    #     print("ejecucion",puntero)
-    #     tipoRecorrido = random.randint(1,3)
-    #     self.resetLista()
-    #     if(tipoRecorrido == 1): self.mostrarInOrden(self.getRaiz())
-    #     if(tipoRecorrido == 2): self.mostrarPreOrden(self.getRaiz())
-    #     if(tipoRecorrido == 3): self.mostrarPostOrden(self.getRaiz())
-
-    #     self.recolectar(canvas, 0, puntero)
-
-    # #? nos permite recolectar los materiales mientra hacemos el recorrido seleccionado
-    # def recolectar(self, canvas, cont, puntero):
-    #     # print(cont, length)
-    #     if(cont <= len(self.lista)-1): 
-    #         canvas.moveto(puntero, self.lista[cont].getX()-4, self.lista[cont].getY()-4)
-
-    #     tarea = canvas.after(1000, self.recolectar, canvas, cont+1, puntero)
-    #     if(cont == len(self.lista)-1): 
-    #         canvas.after_cancel(tarea)
-    #         return
-
     def mostrarInOrden(self, temp):
         if(temp == None): return
         
@@ -116,9 +94,7 @@ class Arbol:
 
     def eliminarNodoConHijo(self, temp, nodo):
         if(temp.getDato() == nodo.getDato()):
-            # Si tiene nodo con hijo
-            # Izquierda = 1
-            # Derecha = 2
+           
             if(temp.getIzquierda() != None or temp.getDerecha() != None):
                 if(temp.getIzquierda() != None):
                     return 1
@@ -177,9 +153,9 @@ class Arbol:
 
     def Amplitud(self,dato):
         ListaA=[]
-        ListaA.append(self.Raiz)
-        i=0;
-        ListaDatos=[];
+        ListaA.append(self.raiz)
+        i=0
+        ListaDatos=[]
 
         while i<len(ListaA):
             Nodo=ListaA[i]
@@ -187,10 +163,10 @@ class Arbol:
             ListaA.pop(i)
             ListaDatos.append(Nodo);
             if Nodo.getIzq()!=None:
-                ListaA.append(Nodo.getIzq())
+                ListaA.append(Nodo.getIzquierda())
 
-            if Nodo.getDer() != None:
-                ListaA.append(Nodo.getDer())
+            if Nodo.getDerecha() != None:
+                ListaA.append(Nodo.getDerecha())
 
         self.Recorrerlista(ListaDatos,dato)
 

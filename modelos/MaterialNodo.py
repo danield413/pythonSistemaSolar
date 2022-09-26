@@ -1,18 +1,12 @@
-class Nodo:
+class MaterialNodo:
 
-    def __init__(self, codigo, nombre, material, cantidad, x, y, x2, y2):
-        self.vecesVisitado = 0
+    def __init__(self, codigoAsignado, fecha, tipoMaterial):
         self.izquierda = None
         self.derecha = None
-        self.codigo = codigo
-        self.nombre = nombre
-        self.material = material
-        self.cantidad = cantidad
-        self.coordenadaX1 = x
-        self.coordenadaY1 = y
-        self.coordenadaX2 = x2
-        self.coordenadaY2 = y2
-
+        self.codigoAsignado = codigoAsignado
+        self.fecha = fecha
+        self.tipoMaterial = tipoMaterial
+    
     def getX(self):
         return self.coordenadaX1
 
