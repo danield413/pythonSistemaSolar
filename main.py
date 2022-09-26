@@ -20,8 +20,18 @@ VELOCIDAD_SALIDA = 4000
 
 def reiniciarCapacidadNaves():
     naves[0].setCapacidad(0)
+    naves[0].setCapacidadOro(0)
+    naves[0].setCapacidadPlata(0)
+    naves[0].setCapacidadBronce(0)
     naves[1].setCapacidad(0)
+    naves[1].setCapacidadOro(0)
+    naves[1].setCapacidadPlata(0)
+    naves[1].setCapacidadBronce(0)
     naves[2].setCapacidad(0)
+    naves[2].setCapacidadOro(0)
+    naves[2].setCapacidadPlata(0)
+    naves[2].setCapacidadBronce(0)
+    
 
 def generarMateriales():
     nodos = arbolSistema.mostrarInOrden(arbolSistema.getRaiz())
@@ -82,7 +92,7 @@ def empezarARecolectar(puntero):
         canvas.itemconfig(puntero, fill=naves[indexNave].getColor())
         despacharNave(0, puntero, naves[indexNave])
 
-        canvas.after(20000, empezarARecolectar, puntero)
+        canvas.after(15000, empezarARecolectar, puntero)
 
 #? salida de la nave
 def despacharNave(cont, puntero, naveActual):
@@ -96,7 +106,10 @@ def despacharNave(cont, puntero, naveActual):
 
 #? recoleccion de materiales en los planetas
 def recolectar(cont, lista, length, puntero, naveActual):
-    tarea = canvas.after(2000, recolectar, cont+1, lista, length, puntero, naveActual)
+    # print("NAVE", naveActual.getColor())
+    # print("NAVE bronce", naveActual.getCapacidadBronce())
+
+    tarea = canvas.after(1000, recolectar, cont+1, lista, length, puntero, naveActual)
 
     if(cont >= length):
         naveActual.setViaje(False)
@@ -106,31 +119,120 @@ def recolectar(cont, lista, length, puntero, naveActual):
         return
 
     planetaActual = lista[cont]
+    print(planetaActual.getMaterial())
     cantidadPlaneta = planetaActual.getCantidad()
-    capacidadNave = naveActual.getCapacidad()
-    restantesNave = 30 - capacidadNave
-    print(nave.getNumero(), "DISPONIBLE: ", restantesNave)
-    if(restantesNave < 31):
-        if(cantidadPlaneta < restantesNave):
-            #22 - 30
-            # print("quitó a")
-            planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
-            naveActual.setCapacidad(naveActual.getCapacidad() + cantidadPlaneta)
 
-        if(cantidadPlaneta > restantesNave):
-            #90 - 20
-            # 90 - (90-20)
-            # print("quitó b")
-            planetaActual.disminuirCantidad(cantidadPlaneta - (cantidadPlaneta - restantesNave), canvas)
-            naveActual.setCapacidad(naveActual.getCapacidad() + restantesNave )
+    capacidadOro = naveActual.getCapacidadOro()
+    restantesOro = 30 - capacidadOro
 
-    if(restantesNave == 0 and cont >= length):
-        print("Nave devuelta a la base")
-        reiniciarCapacidadNaves()
-        naveActual.guardarAlmacenamiento()
+    capacidadPlata = naveActual.getCapacidadPlata()
+    restantesPlata = 30 - capacidadPlata
+
+    capacidadBronce = naveActual.getCapacidadBronce()
+    restantesBronce = 30 - capacidadBronce
+    print("NAVE quedan", restantesBronce)
+
+    print("ORO: DISPONIBLE: ",restantesOro)
+    print("PLATA: DISPONIBLE: ",restantesPlata)
+    print("BRONCE: DISPONIBLE: ",restantesBronce)
+
+
+    #? puedo sacar oro
+    if(restantesOro < 31 and planetaActual.getMaterial() == 'oro' and not naveActual.getCargaLlena()):
+            if(cantidadPlaneta < restantesOro):
+                
+                planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
+                naveActual.setCapacidadOro(naveActual.getCapacidadOro() + cantidadPlaneta)
+
+            if(cantidadPlaneta > restantesOro):
+                #90 - 20
+                # 90 - (90-20)
+                # print("quitó b")
+                planetaActual.disminuirCantidad(cantidadPlaneta - (cantidadPlaneta - restantesOro), canvas)
+                naveActual.setCapacidadOro(naveActual.getCapacidadOro() + restantesOro )
+
+    # #? puedo sacar plata
+    if(restantesPlata < 31 and planetaActual.getMaterial() == 'plata' and not naveActual.getCargaLlena()):
+
+            if(cantidadPlaneta < restantesPlata):
+                #22 - 30
+                # print("quitó a")
+                planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
+                naveActual.setCapacidadPlata(naveActual.getCapacidadPlata() + cantidadPlaneta)
+
+            if(cantidadPlaneta > restantesPlata):
+                #90 - 20
+                # 90 - (90-20)
+                # print("quitó b")
+                planetaActual.disminuirCantidad(cantidadPlaneta - (cantidadPlaneta - restantesPlata), canvas)
+                naveActual.setCapacidadPlata(naveActual.getCapacidadPlata() + restantesPlata)
+
+    #? puedo sacar bronce
+    if(restantesBronce < 31 and planetaActual.getMaterial() == 'bronce' and not naveActual.getCargaLlena()):
+            # print("PLANETA CON BRONCE")
+
+            if(cantidadPlaneta < restantesBronce):
+                #22 - 30
+                
+                # print(restantesBronce, cantidadPlaneta)
+                planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
+                naveActual.setCapacidadBronce(naveActual.getCapacidadBronce() + cantidadPlaneta)
+
+            if(cantidadPlaneta > restantesBronce):
+                #90 - 20
+                # 90 - (90-20)
+                # print(restantesBronce)
+                planetaActual.disminuirCantidad(cantidadPlaneta - (cantidadPlaneta - restantesBronce), canvas)
+                naveActual.setCapacidadBronce(naveActual.getCapacidadBronce() + restantesBronce )
+
+            print("quedan:", planetaActual.getCantidad(), planetaActual.getNombre())
+            print("en nave:", naveActual.getCapacidadBronce(), naveActual.getColor())
+
+    if(restantesOro == 0) : 
+        print(">>>>> ORO LLENO, DEVUELVE NAVE")
+        naveActual.setCargaLlena(True)
+
+    if(restantesPlata == 0) : 
+        print(">>>>> PLATA LLENO, DEVUELVE NAVE")
+        naveActual.setCargaLlena(True)
+        
+    if(restantesBronce == 0) : 
+        print(">>>>> BRONCE LLENO, DEVUELVE NAVE")
+        naveActual.setCargaLlena(True)
+        
 
     canvas.moveto(puntero, lista[cont].getX()-4, lista[cont].getY()-4)
     return
+
+    # if(( or restantesPlata == 0 or restantesBronce == 0) and cont >= length):
+    #     if(restantesOro == 0): 
+    #     if(restantesPlata == 0): print(">>>> PLATA LLENO, DEVUELVE NAVE")
+    #     if(restantesBronce == 0): print(">>>> BRONCE LLENO, DEVUELVE NAVE")
+    #     canvas.after_cancel(tarea)
+
+    # planetaActual = lista[cont]
+    # cantidadPlaneta = planetaActual.getCantidad()
+    # capacidadNave = naveActual.getCapacidad()
+    # restantesNave = 30 - capacidadNave
+    # print(nave.getNumero(), "DISPONIBLE: ", restantesNave)
+    # if(restantesNave < 31):
+    #     if(cantidadPlaneta < restantesNave):
+    #         #22 - 30
+    #         # print("quitó a")
+    #         planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
+    #         naveActual.setCapacidad(naveActual.getCapacidad() + cantidadPlaneta)
+
+    #     if(cantidadPlaneta > restantesNave):
+    #         #90 - 20
+    #         # 90 - (90-20)
+    #         # print("quitó b")
+    #         planetaActual.disminuirCantidad(cantidadPlaneta - (cantidadPlaneta - restantesNave), canvas)
+    #         naveActual.setCapacidad(naveActual.getCapacidad() + restantesNave )
+
+    # if(restantesNave == 0 and cont >= length):
+    #     print("Nave devuelta a la base")
+    #     reiniciarCapacidadNaves()
+    #     naveActual.guardarAlmacenamiento()
 
 #Ventana
 ventana = Tk()
