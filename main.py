@@ -71,7 +71,7 @@ def recolectar(cont, lista, length, puntero, naveActual):
     restantesPlata = 30 - capacidadPlata
     restantesBronce = 30 - capacidadBronce
 
-    print(planetaActual.getNombre(), planetaActual.getCantidad())
+    # print(planetaActual.getNombre(), planetaActual.getCantidad())
 
     #? puedo sacar oro
     if(restantesOro < 31 and planetaActual.getMaterial() == 'oro'):

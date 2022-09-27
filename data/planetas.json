@@ -9,7 +9,8 @@
         "posicionX2": 240,
         "posicionY2": 50,
         "textX": 230,
-        "textY": 60
+        "textY": 60,
+        "hijos": ["Mercurio", "Triton"]
     },
     {
         "codigo": 50,
@@ -21,7 +22,8 @@
         "posicionX2": 170,
         "posicionY2": 120,
         "textX": 150,
-        "textY": 130
+        "textY": 130,
+        "hijos": ["Tarca", "Zulman"]
     },
     {
         "codigo": 20,
@@ -57,7 +59,8 @@
         "posicionX2": 300,
         "posicionY2": 120,
         "textX": 280,
-        "textY": 130
+        "textY": 130,
+        "hijos": ["Zork", "Beltrak"]
     },
     {
         "codigo": 120,
@@ -69,7 +72,8 @@
         "posicionX2": 270,
         "posicionY2": 210,
         "textX": 250,
-        "textY": 220
+        "textY": 220,
+        "hijos": ["Yari"]
     },
     {
         "codigo": 200,
