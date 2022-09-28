@@ -35,7 +35,8 @@
         "posicionX2": 130,
         "posicionY2": 210,
         "textX": 110,
-        "textY": 220
+        "textY": 220,
+        "hijos": []
     },
     {
         "codigo": 80,
@@ -47,7 +48,8 @@
         "posicionX2": 200,
         "posicionY2": 210,
         "textX": 180,
-        "textY": 220
+        "textY": 220,
+        "hijos": []
     },
     {
         "codigo": 150,
@@ -85,7 +87,8 @@
         "posicionX2": 330,
         "posicionY2": 210,
         "textX": 320,
-        "textY": 220
+        "textY": 220,
+        "hijos": []
     },
     {
         "codigo": 110,
@@ -97,6 +100,7 @@
         "posicionX2": 260,
         "posicionY2": 310,
         "textX": 260,
-        "textY": 320
+        "textY": 320,
+        "hijos": []
     }
 ]

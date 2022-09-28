@@ -3,6 +3,7 @@ class Arbol:
     def __init__ (self):
         self.raiz = None
         self.lista = []
+        self.listaPrueba = []
 
     def getRaiz(self):
         return self.raiz 
@@ -75,16 +76,17 @@ class Arbol:
         return False
 
     def eliminarHoja(self, temp, nodo):
-        if(temp.getDato() == nodo.getDato()):
+        if(temp.getDato() == nodo):
+            print("hojaaaa")
             #! si es hoja retorna True
             if(temp.getIzquierda() == None and temp.getDerecha() == None):
                 return True
             
-        if(nodo.getDato() < temp.getDato()):
+        if(nodo < temp.getDato()):
             if( self.eliminarHoja(temp.getIzquierda(), nodo) ):
                 temp.setIzquierda(None)
                 
-        if(nodo.getDato() > temp.getDato()):
+        if(nodo > temp.getDato()):
             if( self.eliminarHoja(temp.getDerecha(), nodo) ):
                 temp.setDerecha(None)
                 

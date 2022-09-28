@@ -1,8 +1,6 @@
 from abc import abstractmethod
 import random
-
-from modelos.JSON import JSON
-from modelos.Nodo import Nodo
+from tkinter import *
 
 class Helpers:
 
@@ -60,33 +58,31 @@ class Helpers:
 
     @abstractmethod
     def generarSistema(canvas, arbolSistema, naves):
-        aristas = JSON.leerJSON("./data/aristas.json")
-        planetas = JSON.leerJSON("./data/planetas.json")
-        for i in aristas:
-            canvas.create_line(i["xInicio"], i["yInicio"], i["xFinal"], i["yFinal"], fill="#00969D")
+        canvas.delete("naveActual")
+        canvas.delete("oro")
+        canvas.delete("plata")
+        canvas.delete("bronce")
+        canvas.delete("unidadesAlmacen")
+        canvas.delete("nodosArbolMateriales")
 
-        for i in planetas:
+        canvas.create_text(40, 60, text="Nave: ", tags=["naveActual"], font=('Helvetica', 9, 'bold'), fill="white")
+        canvas.create_text(40, 80, text="Oro: 0", tags=["oro"], font=('Helvetica', 9, 'bold'), fill="white")
+        canvas.create_text(40, 100, text="Plata: 0", tags=["plata"], font=('Helvetica', 9, 'bold'), fill="white")
+        canvas.create_text(40, 120, text="Bronce: 0", tags=["bronce"], font=('Helvetica', 9, 'bold'), fill="white")
+        canvas.create_text(450, 140, text="Unid. Almacén: 0", tags=["unidadesAlmacen"], font=('Helvetica', 9, 'bold'), fill="white")
+        canvas.create_text(450, 160, text="Arb Mat. Nodos: 0", tags=["nodosArbolMateriales"], font=('Helvetica', 9, 'bold'), fill="white")
+
+        for i in arbolSistema.mostrarInOrden(arbolSistema.getRaiz()):
             # Planeta UI
             color = ""
-            if(i["material"] == "oro"): color = "#BBA750"
-            if(i["material"] == "plata"): color = "#839D9E"
-            if(i["material"] == "bronce"): color = "#7B5F32"
-            canvas.create_oval(i["posicionX1"], i["posicionY1"], i["posicionX2"], i["posicionY2"], fill=color)
-            nombre = "{0} - {1}".format(i["nombre"],i["codigo"])
-            canvas.create_text(i["textX"], i["textY"], text=nombre,font=('Helvetica', 9, 'bold'), fill="white")
-            canvas.create_text(i["textX"], i["textY"]+15, text=i["cantidad"], font=('Helvetica', 9, 'bold'), tags=nombre, fill="white")
+            if(i.getMaterial() == "oro"): color = "#BBA750"
+            if(i.getMaterial() == "plata"): color = "#839D9E"
+            if(i.getMaterial() == "bronce"): color = "#7B5F32"
+            canvas.create_oval(i.getX(), i.getY(), i.getX2(), i.getY2(), fill=color)
+            nombre = "{0} - {1}".format(i.getNombre(),i.getDato())
+            canvas.create_text(i.getX()+10, i.getY2()+15, text=nombre,font=('Helvetica', 9, 'bold'), fill="white")
+            canvas.create_text(i.getX()+10, i.getY2()+30, text=i.getCantidad(), font=('Helvetica', 9, 'bold'), tags=nombre, fill="white")
         
-            codigo = i["codigo"]
-            nombre = i["nombre"]
-            material = i["material"]
-            cantidad = i["cantidad"]
-            x = i["posicionX1"]
-            y = i["posicionY1"]
-            x2 = i["posicionX2"]
-            y2 = i["posicionY2"]
-            # Se agrega al árbol
-            arbolSistema.agregar(Nodo(codigo, nombre, material, cantidad, x, y, x2, y2))
-
         Helpers.generarMateriales(canvas, arbolSistema)
         naves[0].cambiarRecorrido(arbolSistema)
         naves[1].cambiarRecorrido(arbolSistema)

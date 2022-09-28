@@ -5,7 +5,9 @@ from helpers.Helpers import Helpers
 
 from modelos.Almacen import Almacen
 from modelos.Arbol import Arbol
+from modelos.JSON import JSON
 from modelos.Nave import Nave
+from modelos.Nodo import Nodo
 
 arbolSistema = Arbol()
 arbolMateriales = Arbol()
@@ -15,9 +17,24 @@ nave = Nave(1)
 nave2 = Nave(2)
 nave3 = Nave(3)
 naves = [nave, nave2, nave3]
+planetas = JSON.leerJSON("./data/planetas.json")
 
 def generarSistema():
+    for i in planetas:
+        nodoPlaneta = Nodo(i["codigo"], i["nombre"], i["material"], i["cantidad"], i["posicionX1"], i["posicionY1"], i["posicionX2"], i["posicionY2"])
+        arbolSistema.agregar(nodoPlaneta)
+
     Helpers.generarSistema(canvas, arbolSistema, naves)
+
+def pararRecoleccion():
+    for i in naves:
+        i.setViaje(True)
+        i.setCargaLlena(True)
+
+def buscarPlaneta(nombre):
+    for i in planetas:
+        if(i["nombre"] == nombre): return i
+    else: None
 
 def enviarNaves():
     proceso1 = empezarARecolectar('nave')
@@ -158,18 +175,12 @@ Button(ventana, text="Generar sistema", foreground="white", background="black", 
 Button(ventana, text="Recolectar", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold'), command=enviarNaves).pack()
 Button(ventana, text="Destruir", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold')).pack()
 Button(ventana, text="Ver arbol de materiales", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold')).pack()
+Button(ventana, text="Parar recolecciòn", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold'), command=pararRecoleccion).pack()
 
 #Gráfico
 canvas = Canvas(ventana, width=550, height=400, bg='black')
 canvas.pack(expand=YES)
 naveImg = PhotoImage(file='./images/nave.png')
 canvas.create_image(40,20, image=naveImg, tags=["nave"])
-
-canvas.create_text(40, 60, text="Nave: ", tags=["naveActual"], font=('Helvetica', 9, 'bold'), fill="white")
-canvas.create_text(40, 80, text="Oro: 0", tags=["oro"], font=('Helvetica', 9, 'bold'), fill="white")
-canvas.create_text(40, 100, text="Plata: 0", tags=["plata"], font=('Helvetica', 9, 'bold'), fill="white")
-canvas.create_text(40, 120, text="Bronce: 0", tags=["bronce"], font=('Helvetica', 9, 'bold'), fill="white")
-canvas.create_text(450, 140, text="Unid. Almacén: 0", tags=["unidadesAlmacen"], font=('Helvetica', 9, 'bold'), fill="white")
-canvas.create_text(450, 160, text="Arb Mat. Nodos: 0", tags=["nodosArbolMateriales"], font=('Helvetica', 9, 'bold'), fill="white")
 
 mainloop()
