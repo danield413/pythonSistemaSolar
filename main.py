@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 from tkinter import *
 import threading
@@ -6,11 +7,13 @@ from helpers.Helpers import Helpers
 from modelos.Almacen import Almacen
 from modelos.Arbol import Arbol
 from modelos.JSON import JSON
+from modelos.MaterialArbol import MaterialArbol
+from modelos.MaterialNodo import MaterialNodo
 from modelos.Nave import Nave
 from modelos.Nodo import Nodo
 
 arbolSistema = Arbol()
-arbolMateriales = Arbol()
+arbolMateriales = MaterialArbol()
 almacen = Almacen()
 
 nave = Nave(1)
@@ -19,19 +22,32 @@ nave3 = Nave(3)
 naves = [nave, nave2, nave3]
 planetas = JSON.leerJSON("./data/planetas.json")
 
+def verArbolMateriales():
+    pararRecoleccion()
+    Helpers.mostrarArbolMateriales(arbolMateriales)
+    
 def generarSistema():
     for i in planetas:
         nodoPlaneta = Nodo(i["codigo"], i["nombre"], i["material"], i["cantidad"], i["posicionX1"], i["posicionY1"], i["posicionX2"], i["posicionY2"])
         arbolSistema.agregar(nodoPlaneta)
 
-    Helpers.generarSistema(canvas, arbolSistema, naves)
+    Helpers.mostrarArbol(canvas, arbolSistema, naves)
+    Helpers.generarMateriales(canvas, arbolSistema)
+    naves[0].cambiarRecorrido(arbolSistema)
+    naves[1].cambiarRecorrido(arbolSistema)
+    naves[2].cambiarRecorrido(arbolSistema)
 
 def pararRecoleccion():
     for i in naves:
         i.setViaje(True)
         i.setCargaLlena(True)
 
-def buscarPlaneta(nombre):
+def reanudarRecollecion():
+    for i in naves:
+        i.setViaje(False)
+        i.setCargaLlena(False)
+
+def buscarPlaneta(nombre) -> object:
     for i in planetas:
         if(i["nombre"] == nombre): return i
     else: None
@@ -42,16 +58,28 @@ def enviarNaves():
     hilo1.start()
 
 def guardarMaterialEnAlmacen(recoleccion):
-    print(recoleccion)
     almacen.setOroAlmacenado(almacen.getOroAlmacenado() + recoleccion["oro"])
     almacen.setPlataAlmacenada(almacen.getPlataAlmacenada() + recoleccion["plata"])
     almacen.setBronceAlmacenado(almacen.getBronceAlmacenado() + recoleccion["bronce"])
-    print("ALMACEN ORO:", almacen.getOroAlmacenado())
-    print("ALMACEN PLATA:", almacen.getPlataAlmacenada())
-    print("ALMACEN BRONCE:", almacen.getBronceAlmacenado())
+    
     texto = "Unid. Almacén: " + str(almacen.getOroAlmacenado()+almacen.getPlataAlmacenada()+almacen.getBronceAlmacenado())
     canvas.itemconfig('unidadesAlmacen', text=texto)
-    
+
+    if(almacen.getOroAlmacenado() > 30):
+       almacenarMaterial("oro", almacen.getOroAlmacenado())
+    if(almacen.getPlataAlmacenada() > 30):
+       almacenarMaterial("plata", almacen.getPlataAlmacenada())
+    if(almacen.getBronceAlmacenado() > 30):
+        almacenarMaterial("bronce", almacen.getBronceAlmacenado())
+
+    textoNodos = "Arb Mat. Nodos: " +  str(arbolMateriales.cantidadNodos(arbolMateriales.getRaiz()))
+    canvas.itemconfig('nodosArbolMateriales', text=textoNodos)    
+
+def almacenarMaterial(tipoMaterial, cantidad):
+    codigoAlmacenaje = Helpers.generarCodigoAlmacenajeMaterial()
+    nuevoNodo = MaterialNodo(codigoAlmacenaje, datetime.now(), tipoMaterial, cantidad)
+    arbolMateriales.agregar(nuevoNodo)
+
 def finalizarRecorrido(naveActual, tarea):
     Helpers.reiniciarRecorridoNave(naves, canvas)
     naveActual.cambiarRecorrido(arbolSistema)
@@ -65,7 +93,7 @@ def empezarARecolectar(puntero):
         texto = "Nave: " + str(indexNave+1)
         canvas.itemconfig("naveActual", text=texto)
         print(">> Despacho: ", texto)
-        canvas.after(4000, empezarARecolectar, puntero)
+        canvas.after(3000, empezarARecolectar, puntero)
 
 #? salida de la nave
 def despacharNave(cont, puntero, naveActual):
@@ -76,7 +104,7 @@ def despacharNave(cont, puntero, naveActual):
         return
 
 def recolectar(cont, lista, length, puntero, naveActual):
-    tarea = canvas.after(300, recolectar, cont+1, lista, length, puntero, naveActual)
+    tarea = canvas.after(250, recolectar, cont+1, lista, length, puntero, naveActual)
     canvas.moveto(puntero, lista[cont].getX()-4, lista[cont].getY()-4)
     planetaActual = lista[cont]
 
@@ -92,7 +120,7 @@ def recolectar(cont, lista, length, puntero, naveActual):
 
     #? puedo sacar oro
     if(restantesOro < 31 and planetaActual.getMaterial() == 'oro'):
-        print("EXTRAIGO ORO")
+        # print("EXTRAIGO ORO")
 
         if(cantidadPlaneta < restantesOro):
             planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
@@ -108,7 +136,7 @@ def recolectar(cont, lista, length, puntero, naveActual):
 
     #? puedo sacar plata
     if(restantesPlata < 31 and planetaActual.getMaterial() == 'plata'):
-        print("EXTRAIGO PLATA")
+        # print("EXTRAIGO PLATA")
 
         if(cantidadPlaneta < restantesPlata):
             planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
@@ -124,7 +152,7 @@ def recolectar(cont, lista, length, puntero, naveActual):
 
     #? puedo sacar bronce
     if(restantesBronce < 31 and planetaActual.getMaterial() == 'bronce'):
-        print("EXTRAIGO BRONCE")
+        # print("EXTRAIGO BRONCE")
 
         if(cantidadPlaneta < restantesBronce):
             planetaActual.disminuirCantidad(cantidadPlaneta, canvas)
@@ -141,26 +169,27 @@ def recolectar(cont, lista, length, puntero, naveActual):
     recoleccion = {
         "oro": naveActual.getCapacidadOro(),
         "plata": naveActual.getCapacidadPlata(),
-        "bronce": naveActual.getCapacidadBronce()
+        "bronce": naveActual.getCapacidadBronce(),
+        "fecha": datetime.now()
     }
 
     if(restantesOro == 0): 
-        print(">>>>> ORO LLENO, DEVUELVE NAVE")
+        # print(">>>>> ORO LLENO, DEVUELVE NAVE")
         guardarMaterialEnAlmacen(recoleccion)
         finalizarRecorrido(naveActual, tarea)
 
     if(restantesPlata == 0): 
-        print(">>>>> PLATA LLENO, DEVUELVE NAVE")
+        # print(">>>>> PLATA LLENO, DEVUELVE NAVE")
         guardarMaterialEnAlmacen(recoleccion)
         finalizarRecorrido(naveActual, tarea)
         
     if(restantesBronce == 0): 
-        print(">>>>> BRONCE LLENO, DEVUELVE NAVE")
+        # print(">>>>> BRONCE LLENO, DEVUELVE NAVE")
         guardarMaterialEnAlmacen(recoleccion)
         finalizarRecorrido(naveActual, tarea)
 
     if(cont == length):
-        print("no logró llenar la capacidad")
+        # print("no logró llenar la capacidad")
         guardarMaterialEnAlmacen(recoleccion)
         canvas.moveto(puntero, 40, 20)
         canvas.after_cancel(tarea)
@@ -174,12 +203,11 @@ ventana.configure(background="black")
 Button(ventana, text="Generar sistema", foreground="white", background="black",  padx=5, pady=5, command=generarSistema, font=('Helvetica', 9, 'bold')).pack()
 Button(ventana, text="Recolectar", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold'), command=enviarNaves).pack()
 Button(ventana, text="Destruir", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold')).pack()
-Button(ventana, text="Ver arbol de materiales", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold')).pack()
-Button(ventana, text="Parar recolecciòn", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold'), command=pararRecoleccion).pack()
+Button(ventana, text="Ver arbol de materiales", foreground="white", background="black", padx=5, pady=5, font=('Helvetica', 9, 'bold'), command=verArbolMateriales).pack()
 
 #Gráfico
 canvas = Canvas(ventana, width=550, height=400, bg='black')
-canvas.pack(expand=YES)
+canvas.pack(expand=NO)
 naveImg = PhotoImage(file='./images/nave.png')
 canvas.create_image(40,20, image=naveImg, tags=["nave"])
 

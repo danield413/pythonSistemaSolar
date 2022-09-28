@@ -1,6 +1,7 @@
 from abc import abstractmethod
 import random
 from tkinter import *
+from turtle import width
 
 class Helpers:
 
@@ -8,7 +9,11 @@ class Helpers:
         pass
 
     @abstractmethod
-    def generarRecorrido(nave, arbolSistema):
+    def generarCodigoAlmacenajeMaterial() -> int:
+        return random.randint(0,1000)
+
+    @abstractmethod
+    def generarRecorrido(nave, arbolSistema) -> list:
         numeroRandom = random.randint(1,3)
         # print(">> Nave:", nave.getNumero(), "- Recorrido asignado => ", numeroRandom)
         recorrido = []
@@ -52,12 +57,13 @@ class Helpers:
 
     @abstractmethod
     def generarMateriales(canvas, arbolSistema):
+        arbolSistema.resetLista()
         nodos = arbolSistema.mostrarInOrden(arbolSistema.getRaiz())
         for i in nodos:
             i.aumentarCantidad(canvas)
 
     @abstractmethod
-    def generarSistema(canvas, arbolSistema, naves):
+    def mostrarArbol(canvas, arbolSistema, naves):
         canvas.delete("naveActual")
         canvas.delete("oro")
         canvas.delete("plata")
@@ -73,7 +79,6 @@ class Helpers:
         canvas.create_text(450, 160, text="Arb Mat. Nodos: 0", tags=["nodosArbolMateriales"], font=('Helvetica', 9, 'bold'), fill="white")
 
         for i in arbolSistema.mostrarInOrden(arbolSistema.getRaiz()):
-            # Planeta UI
             color = ""
             if(i.getMaterial() == "oro"): color = "#BBA750"
             if(i.getMaterial() == "plata"): color = "#839D9E"
@@ -82,8 +87,29 @@ class Helpers:
             nombre = "{0} - {1}".format(i.getNombre(),i.getDato())
             canvas.create_text(i.getX()+10, i.getY2()+15, text=nombre,font=('Helvetica', 9, 'bold'), fill="white")
             canvas.create_text(i.getX()+10, i.getY2()+30, text=i.getCantidad(), font=('Helvetica', 9, 'bold'), tags=nombre, fill="white")
-        
-        Helpers.generarMateriales(canvas, arbolSistema)
-        naves[0].cambiarRecorrido(arbolSistema)
-        naves[1].cambiarRecorrido(arbolSistema)
-        naves[2].cambiarRecorrido(arbolSistema)
+
+        for i in arbolSistema.mostrarInOrden(arbolSistema.getRaiz()):
+            if(i.getIzquierda()):
+                canvas.create_line(i.getX()+15, i.getY()+15, i.getIzquierda().getX()+15, i.getIzquierda().getY()+15,fill="red", width=2)
+            if(i.getDerecha()):
+                canvas.create_line(i.getX()+15, i.getY()+15, i.getDerecha().getX()+15, i.getDerecha().getY()+15, fill="blue", width=2)
+
+    def mostrarArbolMateriales(arbolMateriales):
+        materiales =  arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz())
+        ventanados = Tk()
+        ventanados.geometry("600x600")
+        ventanados.title("Arbol de materiales")
+        canvasdos = Canvas(ventanados, width=550, height=600, bg='black')
+        canvasdos.pack(expand=YES)
+
+        for i in materiales:
+            canvasdos.create_oval(i.getX(), i.getY(), i.getX2(), i.getY2(), fill=i.getColor())
+            canvasdos.create_text(i.getTextX(), i.getY2()+15, text=i.getDato(), fill=i.getTextColor())
+
+        for i in materiales:
+            if(i.getIzquierda()):
+                canvasdos.create_line(i.getX()+15, i.getY()+15, i.getIzquierda().getX()+15, i.getIzquierda().getY()+15, fill="red", width=2)
+            if(i.getDerecha()):
+                canvasdos.create_line(i.getX()+15, i.getY()+15, i.getDerecha().getX()+15, i.getDerecha().getY()+15, fill="blue", width=2)
+
+        mainloop()

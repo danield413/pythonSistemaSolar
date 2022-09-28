@@ -59,6 +59,7 @@ class Nodo:
         self.vecesVisitado += 1
 
     def aumentarCantidad(self, canvas):
+        # print("me llaméeeeee")
         self.cantidad += 2
         canvas.itemconfig(self.nombre, text=str( self.cantidad ))
         canvas.after(10000, self.aumentarCantidad, canvas)

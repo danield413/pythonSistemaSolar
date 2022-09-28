@@ -1,23 +1,61 @@
 class MaterialNodo:
 
-    def __init__(self, codigoAsignado, fecha, tipoMaterial):
+    def __init__(self, codigo, fecha, tipoMaterial, cantidad):
         self.izquierda = None
         self.derecha = None
-        self.codigoAsignado = codigoAsignado
+        self.codigo = codigo
         self.fecha = fecha
         self.tipoMaterial = tipoMaterial
+        self.cantidad = cantidad
+        self.x1 = 0
+        self.y1 = 0
+        self.x2 = 0
+        self.y2 = 0
+        self.color = "white"
+        self.textX = 0
+        self.textColor = "white"
+
+    def getTextColor(self):
+        return self.textColor
+
+    def setTextColor(self, valor):
+        self.textColor = valor
+
+    def getTextX(self):
+        return self.textX
+
+    def setTextX(self, valor):
+        self.textX = valor
+
+    def getColor(self):
+        return self.color
+
+    def setColor(self, valor):
+        self.color = valor        
     
     def getX(self):
-        return self.coordenadaX1
+        return self.x1
 
     def getY(self):
-        return self.coordenadaY1
+        return self.y1
 
     def getX2(self):
-        return self.coordenadaX2
+        return self.x2
 
     def getY2(self):
-        return self.coordenadaY2
+        return self.y2
+
+    def setX(self, valor):
+        self.x1 = valor
+
+    def setY(self, valor):
+        self.y1 = valor
+
+    def setX2(self, valor):
+        self.x2 = valor
+
+    def setY2(self, valor):
+        self.y2 = valor
 
     def getIzquierda(self):
         return self.izquierda
@@ -51,15 +89,3 @@ class MaterialNodo:
 
     def setVecesVisitado(self):
         self.vecesVisitado += 1
-
-    def aumentarCantidad(self, canvas):
-        self.cantidad += 2
-        canvas.itemconfig(self.nombre, text=str( self.cantidad ))
-        canvas.after(10000, self.aumentarCantidad, canvas)
-
-    def disminuirCantidad(self, valor, canvas):
-        self.cantidad -= valor
-        canvas.itemconfig(self.nombre, text=self.cantidad)
-
-    def getInformacion(self):
-        return "Nombre: {0} - Código: {1} - Material: {2} - Cantidad: {3}".format(self.nombre, self.codigo, self.material, self.cantidad)
