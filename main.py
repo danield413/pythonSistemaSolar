@@ -67,10 +67,13 @@ def guardarMaterialEnAlmacen(recoleccion):
 
     if(almacen.getOroAlmacenado() > 30):
        almacenarMaterial("oro", almacen.getOroAlmacenado())
+       almacen.setOroAlmacenado(0)
     if(almacen.getPlataAlmacenada() > 30):
        almacenarMaterial("plata", almacen.getPlataAlmacenada())
+       almacen.setPlataAlmacenada(0)
     if(almacen.getBronceAlmacenado() > 30):
         almacenarMaterial("bronce", almacen.getBronceAlmacenado())
+        almacen.setBronceAlmacenado(0)
 
     textoNodos = "Arb Mat. Nodos: " +  str(arbolMateriales.cantidadNodos(arbolMateriales.getRaiz()))
     canvas.itemconfig('nodosArbolMateriales', text=textoNodos)    
