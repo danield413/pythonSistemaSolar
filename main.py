@@ -28,6 +28,12 @@ planetas = JSON.leerJSON("./data/planetas.json")
 def verArbolMateriales():
     Helpers.mostrarArbolMateriales(arbolMateriales)
 
+def hayNavesEnRecorrido():
+    for i in naves:
+        if(i.getEnViaje()):
+            return True
+    return False
+
 def generarSistema():
     for i in planetas:
         nodoPlaneta = Nodo(
@@ -41,14 +47,6 @@ def generarSistema():
             i["posicionY2"],
         )
         arbolSistema.agregar(nodoPlaneta)
-
-    # zork = Helpers.getNodo(120, arbolSistema)
-    # print(zork)
-    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
-    # arbolSistema.eliminarNodoConHijo(arbolSistema.getRaiz(), zork)
-    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
-    # zork = Helpers.getNodo(120, arbolSistema)
-    # print("zork >>", zork)
 
     arbolSistema.resetLista()
     Helpers.mostrarArbol(canvas, arbolSistema)
@@ -69,7 +67,7 @@ def reanudarRecolecion():
         i.setCargaLlena(False)
 
 def enviarNaves():
-    proceso1 = empezarARecolectar("nave")
+    proceso1 = empezarARecolectar()
     hilo1 = threading.Thread(name="HiloNave1", target=proceso1)
     hilo1.start()
 
@@ -105,7 +103,6 @@ def almacenarMaterial(tipoMaterial, cantidad):
     nuevoNodo = MaterialNodo(codigoAlmacenaje, datetime.now(), tipoMaterial, cantidad)
     arbolMateriales.agregar(nuevoNodo)
 
-
 def finalizarRecorrido(naveActual, tarea):
     Helpers.reiniciarRecorridoNave(naves, canvas)
     naveActual.cambiarRecorrido(arbolSistema)
@@ -113,19 +110,19 @@ def finalizarRecorrido(naveActual, tarea):
 
 
 # ? ciclo de salidas
-def empezarARecolectar(puntero):
-    
+def empezarARecolectar():
+    print("llamado empezar a recolectar")
     indexNave = random.randint(0, 2)
     if naves[indexNave].getEnViaje() == False:
-        despacharNave(0, puntero, naves[indexNave])
+        despacharNave(0, naves[indexNave])
         texto = "Nave: " + str(indexNave + 1)
         canvas.itemconfig("naveActual", text=texto)
         print(">> Despacho: ", texto)
-        canvas.after(4000, empezarARecolectar, puntero)
+        canvas.after(30000, empezarARecolectar)
 
 
 # ? salida de la nave
-def despacharNave(cont, puntero, naveActual):
+def despacharNave(cont, naveActual):
     if naveActual.getEnViaje() is False:
         naveActual.setViaje(True)
 
@@ -133,14 +130,13 @@ def despacharNave(cont, puntero, naveActual):
             cont,
             naveActual.getRecorrido(),
             len(naveActual.getRecorrido()) - 1,
-            puntero,
             naveActual,
         )
         return
 
-def recolectar(cont, lista, length, puntero, naveActual):
-    tarea = canvas.after(250, recolectar, cont + 1, lista, length, puntero, naveActual)
-    canvas.moveto(puntero, lista[cont].getX() - 4, lista[cont].getY() - 4)
+def recolectar(cont, lista, length, naveActual):
+    tarea = canvas.after(1000, recolectar, cont + 1, lista, length, naveActual)
+    canvas.moveto("nave", lista[cont].getX() - 4, lista[cont].getY() - 4)
     planetaActual = lista[cont]
 
     cantidadPlaneta = planetaActual.getCantidad()
@@ -240,43 +236,47 @@ def recolectar(cont, lista, length, puntero, naveActual):
     if cont == length:
         # print("no logró llenar la capacidad")
         guardarMaterialEnAlmacen(recoleccion)
-        canvas.moveto(puntero, 40, 20)
+        canvas.moveto("nave", 40, 20)
         canvas.after_cancel(tarea)
         Helpers.reiniciarRecorridoNave(naves, canvas)
 
 
 def eliminarPlaneta(nombrePlaneta):
     planeta = Helpers.getNodoPorNombre(nombrePlaneta, arbolSistema)
-    print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
+    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
     arbolSistema.eliminarNodo(planeta)
-    print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
-
+    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
+    
     arbolSistema.resetLista()
     Helpers.mostrarArbol(canvas, arbolSistema)
-
+    reanudarRecolecion()
 
 def mostrarPlanetasVisitados():
     arbolSistema.resetListaVisitados()
-    root = Tk()
-    root.title("Eliminar planeta")
-    root.geometry("400x200")
+    if not hayNavesEnRecorrido():
+        pararRecoleccion()
+        root = Tk()
+        root.title("Eliminar planeta")
+        root.geometry("400x200")
 
-    labels = []
-    for i in arbolSistema.retornarPlanetas(arbolSistema.getRaiz()):
-        if i.getNombre() not in labels:
-            labels.append(i.getNombre())
+        labels = []
+        for i in arbolSistema.retornarPlanetas(arbolSistema.getRaiz()):
+            if i.getNombre() not in labels:
+                labels.append(i.getNombre())
 
 
-    l1 = Label(root, text="Seleccione el planeta que desea eliminar: ")
-    l1.pack()
+        l1 = Label(root, text="Seleccione el planeta que desea eliminar: ")
+        l1.pack()
 
-    lista_desplegable = ttk.Combobox(root, width=20)
-    lista_desplegable["values"] = labels
-    lista_desplegable.pack()
+        lista_desplegable = ttk.Combobox(root, width=20)
+        lista_desplegable["values"] = labels
+        lista_desplegable.pack()
 
-    Button(root, text="eliminar", command=lambda: eliminarPlaneta(lista_desplegable.get())).pack()
+        Button(root, text="eliminar", command=lambda: eliminarPlaneta(lista_desplegable.get())).pack()
 
-    root.mainloop()   
+        root.mainloop()   
+    else:
+        print("no se puede, eliminar hay naves en recorrido")
 
 # Ventana
 ventana = Tk()

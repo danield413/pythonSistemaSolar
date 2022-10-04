@@ -133,7 +133,6 @@ class Arbol:
             if nodo.getDato() < temp.getDato():
                 # Tiene nodo con hijo a la izquierda
                 if self.eliminarNodoConHijo(temp.getIzquierda(), nodo) == 1:
-                    print(temp.getIzquierda().getIzquierda().getInformacion())
                     temp.setIzquierda(temp.getIzquierda().getIzquierda())
                 if self.eliminarNodoConHijo(temp.getIzquierda(), nodo) == 2:
                     temp.setIzquierda(temp.getIzquierda().getDerecha())
