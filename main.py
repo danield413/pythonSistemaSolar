@@ -111,24 +111,24 @@ def finalizarRecorrido(naveActual, tarea):
 
 # ? ciclo de salidas
 def empezarARecolectar():
-    print("llamado empezar a recolectar")
+    
     indexNave = random.randint(0, 2)
     if naves[indexNave].getEnViaje() == False:
         despacharNave(0, naves[indexNave])
         texto = "Nave: " + str(indexNave + 1)
         canvas.itemconfig("naveActual", text=texto)
         print(">> Despacho: ", texto)
-        canvas.after(30000, empezarARecolectar)
+        canvas.after(10000, empezarARecolectar)
 
 
 # ? salida de la nave
 def despacharNave(cont, naveActual):
     if naveActual.getEnViaje() is False:
         naveActual.setViaje(True)
-
+        
         recolectar(
             cont,
-            naveActual.getRecorrido(),
+            naveActual.cambiarRecorrido(arbolSistema),
             len(naveActual.getRecorrido()) - 1,
             naveActual,
         )
@@ -249,12 +249,12 @@ def eliminarPlaneta(nombrePlaneta):
     
     arbolSistema.resetLista()
     Helpers.mostrarArbol(canvas, arbolSistema)
-    reanudarRecolecion()
+       
+
 
 def mostrarPlanetasVisitados():
     arbolSistema.resetListaVisitados()
     if not hayNavesEnRecorrido():
-        pararRecoleccion()
         root = Tk()
         root.title("Eliminar planeta")
         root.geometry("400x200")
@@ -316,5 +316,22 @@ canvas.create_image(0, 0, anchor=tk.NW, image=img)
 # Nave
 naveImg = PhotoImage(file="./images/nave.png")
 canvas.create_image(40, 20, image=naveImg, tags=["nave"])
+
+canvas.create_text(
+    450,
+    140,
+    text="Unid. Almacén: 0",
+    tags=["unidadesAlmacen"],
+    font=("Helvetica", 9, "bold"),
+    fill="black",
+)
+canvas.create_text(
+    450,
+    160,
+    text="Arb Mat. Nodos: 0",
+    tags=["nodosArbolMateriales"],
+    font=("Helvetica", 9, "bold"),
+    fill="black",
+)
 
 mainloop()

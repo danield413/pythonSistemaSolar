@@ -49,7 +49,11 @@ class Nave:
     def getRecorrido(self):
         return self.recorrido
 
+    def resetRecorrido(self):
+        self.recorrido = []
+
     def cambiarRecorrido(self, arbolSistema):
         self.recorrido = []
         self.recorrido = Helpers.generarRecorrido(self, arbolSistema)
+        return self.recorrido
 

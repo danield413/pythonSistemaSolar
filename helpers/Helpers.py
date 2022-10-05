@@ -88,11 +88,11 @@ class Helpers:
 
     @abstractmethod
     def mostrarArbol(canvas, arbolSistema):
-        canvas.delete("oro")
-        canvas.delete("plata")
-        canvas.delete("bronce")
-        canvas.delete("unidadesAlmacen")
-        canvas.delete("nodosArbolMateriales")
+        # canvas.delete("oro")
+        # canvas.delete("plata")
+        # canvas.delete("bronce")
+        # canvas.delete("unidadesAlmacen")
+        # canvas.delete("nodosArbolMateriales")
 
         canvas.delete("Pluton")
         canvas.delete("Mercurio")
@@ -139,22 +139,7 @@ class Helpers:
             font=("Helvetica", 10, "bold"),
             fill="white",
         )
-        canvas.create_text(
-            450,
-            140,
-            text="Unid. Almacén: 0",
-            tags=["unidadesAlmacen"],
-            font=("Helvetica", 9, "bold"),
-            fill="black",
-        )
-        canvas.create_text(
-            450,
-            160,
-            text="Arb Mat. Nodos: 0",
-            tags=["nodosArbolMateriales"],
-            font=("Helvetica", 9, "bold"),
-            fill="black",
-        )
+        
 
         for i in arbolSistema.mostrarInOrden(arbolSistema.getRaiz()):
             color = ""
