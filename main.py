@@ -118,14 +118,14 @@ def empezarARecolectar():
         texto = "Nave: " + str(indexNave + 1)
         canvas.itemconfig("naveActual", text=texto)
         print(">> Despacho: ", texto)
-        canvas.after(10000, empezarARecolectar)
+        canvas.after(30000, empezarARecolectar)
 
 
 # ? salida de la nave
 def despacharNave(cont, naveActual):
     if naveActual.getEnViaje() is False:
         naveActual.setViaje(True)
-        
+
         recolectar(
             cont,
             naveActual.cambiarRecorrido(arbolSistema),
@@ -219,22 +219,22 @@ def recolectar(cont, lista, length, naveActual):
     }
 
     if restantesOro == 0:
-        # print(">>>>> ORO LLENO, DEVUELVE NAVE")
+        print(">> La nave se devolvió, esperando el despacho de otra nave...")
         guardarMaterialEnAlmacen(recoleccion)
         finalizarRecorrido(naveActual, tarea)
 
     if restantesPlata == 0:
-        # print(">>>>> PLATA LLENO, DEVUELVE NAVE")
+        print(">> La nave se devolvió, esperando el despacho de otra nave...")
         guardarMaterialEnAlmacen(recoleccion)
         finalizarRecorrido(naveActual, tarea)
 
     if restantesBronce == 0:
-        # print(">>>>> BRONCE LLENO, DEVUELVE NAVE")
+        print(">> La nave se devolvió, esperando el despacho de otra nave...")
         guardarMaterialEnAlmacen(recoleccion)
         finalizarRecorrido(naveActual, tarea)
 
     if cont == length:
-        # print("no logró llenar la capacidad")
+        print(">> La nave se devolvió, esperando el despacho de otra nave...")
         guardarMaterialEnAlmacen(recoleccion)
         canvas.moveto("nave", 40, 20)
         canvas.after_cancel(tarea)
