@@ -191,6 +191,7 @@ class Helpers:
                 )
 
     def mostrarArbolMateriales(arbolMateriales):
+        arbolMateriales.resetLista()
         materiales = arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz())
         ventanados = Tk()
         ventanados.geometry("600x600")
