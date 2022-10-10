@@ -15,6 +15,12 @@ from modelos.MaterialNodo import MaterialNodo
 from modelos.Nave import Nave
 from modelos.Nodo import Nodo
 
+
+
+""" Crea las instancias del arbol de planetas, del arbol de materiales y del almacen 
+    Crea las instancias de las naves
+    Carga los planetas desde el archivo JSON 
+"""
 arbolSistema = Arbol()
 arbolMateriales = MaterialArbol()
 almacen = Almacen()
@@ -25,15 +31,29 @@ nave3 = Nave(3)
 naves = [nave, nave2, nave3]
 planetas = JSON.leerJSON("./data/planetas.json")
 
-def verArbolMateriales():
-    Helpers.mostrarArbolMateriales(arbolMateriales)
 
-def hayNavesEnRecorrido():
+"""
+    Muestra el arbol de materiales solo si hay almenos un Nodo
+"""
+def verArbolMateriales():
+    if(arbolMateriales.getRaiz() != None):
+        Helpers.mostrarArbolMateriales(arbolMateriales)
+    else:
+        print("No hay materiales almacenados")
+
+"""
+    Retorna True si hay almenos una nave en recorrido
+    :return: un valor Booleano.
+"""
+def hayNavesEnRecorrido() -> bool:
     for i in naves:
         if(i.getEnViaje()):
             return True
     return False
 
+"""
+    Crea el arbol cargandolo del archivo <planetas.json> en la clase Arbol y en la interfaz
+"""
 def generarSistema():
     for i in planetas:
         nodoPlaneta = Nodo(
@@ -56,21 +76,24 @@ def generarSistema():
     naves[2].cambiarRecorrido(arbolSistema)
 
 
-def pararRecoleccion():
-    for i in naves:
-        i.setViaje(True)
-        i.setCargaLlena(True)
 
-def reanudarRecolecion():
-    for i in naves:
-        i.setViaje(False)
-        i.setCargaLlena(False)
-
+"""
+    Crea un Hilo donde se ejecuta la recoleccion de materiales
+    El hilo permite ejecutar la recoleccion de materiales en paralelo
+"""
 def enviarNaves():
     proceso1 = empezarARecolectar()
     hilo1 = threading.Thread(name="HiloNave1", target=proceso1)
     hilo1.start()
 
+
+"""
+    Toma un diccionario de materiales resultado de la recolección de una nave, 
+    los añade al almacén, y si el almacén tiene más de 30 unidades de cualquier material, 
+    los almacena en un árbol de materiales.
+
+    :param recoleccion: un diccionario con los materiales recolectados.
+"""
 def guardarMaterialEnAlmacen(recoleccion):
     almacen.setOroAlmacenado(almacen.getOroAlmacenado() + recoleccion["oro"])
     almacen.setPlataAlmacenada(almacen.getPlataAlmacenada() + recoleccion["plata"])
@@ -98,20 +121,40 @@ def guardarMaterialEnAlmacen(recoleccion):
     )
     canvas.itemconfig("nodosArbolMateriales", text=textoNodos)
 
+
+
+"""
+    Crea un nuevo Nodo en el arbol de materiales
+
+    :param tipoMaterial: String
+    :param cantidad: int
+"""
 def almacenarMaterial(tipoMaterial, cantidad):
     codigoAlmacenaje = Helpers.generarCodigoAlmacenajeMaterial()
     nuevoNodo = MaterialNodo(codigoAlmacenaje, datetime.now(), tipoMaterial, cantidad)
     arbolMateriales.agregar(nuevoNodo)
 
+
+"""
+    Finaliza el recorrido de la nave pasada como argumento y
+    cancela la siguiente tarea programada para la nave.
+
+    :param naveActual: La instancia de la nave que se desea cancelar.
+    :param tarea: la tarea programada para la nave.
+"""
 def finalizarRecorrido(naveActual, tarea):
     Helpers.reiniciarRecorridoNave(naves, canvas)
     naveActual.cambiarRecorrido(arbolSistema)
     canvas.after_cancel(tarea)
 
 
-# ? ciclo de salidas
+
+"""
+    Se encarga de seleccionar una nave aleatoria que esté disponible para realizar un recorrido
+    y llama al método "despachar nave".
+    Esta función se ejecuta cada 30 segundos (30000 milisegundos).
+"""
 def empezarARecolectar():
-    
     indexNave = random.randint(0, 2)
     if naves[indexNave].getEnViaje() == False:
         despacharNave(0, naves[indexNave])
@@ -121,7 +164,13 @@ def empezarARecolectar():
         canvas.after(30000, empezarARecolectar)
 
 
-# ? salida de la nave
+
+"""
+    Si la nave no está en viaje ejecuta la función recolectar.
+
+    :param cont: un contador para saber en que nodo de la ruta se encuentra la nave.
+    :param naveActual: la instancia de la Nave que hará el recorrido
+"""
 def despacharNave(cont, naveActual):
     if naveActual.getEnViaje() is False:
         naveActual.setViaje(True)
@@ -132,8 +181,16 @@ def despacharNave(cont, naveActual):
             len(naveActual.getRecorrido()) - 1,
             naveActual,
         )
-        return
 
+"""
+    Mueve la nave espacial por la pantalla y el arbol al mismo tiempo, 
+    recogiendo recursos de los planetas
+
+    :param cont: la posición actual en la ruta de la nave.
+    :param lista: lista de planetas (nodos) que recorrerá la nave.
+    :param length: la longitud de la lista de planetas.
+    :param naveActual: la instancia de la nave que hace el recorrido.
+"""
 def recolectar(cont, lista, length, naveActual):
     tarea = canvas.after(1000, recolectar, cont + 1, lista, length, naveActual)
     canvas.moveto("nave", lista[cont].getX() - 4, lista[cont].getY() - 4)
@@ -241,17 +298,24 @@ def recolectar(cont, lista, length, naveActual):
         Helpers.reiniciarRecorridoNave(naves, canvas)
 
 
+"""
+    Elimina un nodo del árbol, luego reinicia el árbol y lo dibuja de nuevo
+
+    :param nombrePlaneta: el nombre del planeta a eliminar
+"""
 def eliminarPlaneta(nombrePlaneta):
     planeta = Helpers.getNodoPorNombre(nombrePlaneta, arbolSistema)
-    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
+    print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
     arbolSistema.eliminarNodo(planeta)
-    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
+    print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
     
     arbolSistema.resetLista()
     Helpers.mostrarArbol(canvas, arbolSistema)
        
-
-
+"""
+    Crea una ventana con un menú desplegable de planetas, y al pulsar el botón, 
+    llama a la función función eliminarPlaneta() con el planeta seleccionado como parámetro.
+"""
 def mostrarPlanetasVisitados():
     arbolSistema.resetListaVisitados()
     if not hayNavesEnRecorrido():
@@ -278,6 +342,7 @@ def mostrarPlanetasVisitados():
     else:
         print("no se puede, eliminar hay naves en recorrido")
 
+""" Crea la ventana principal de la aplicación, añade el menú, los botones y el Gráfico canvas."""
 # Ventana
 ventana = Tk()
 ventana.geometry("600x600")

@@ -4,14 +4,29 @@ from tkinter import *
 from PIL import Image, ImageTk
 import tkinter as tk
 
+
+""" Clase Helpers que ayuda a la reutilización de código """
 class Helpers:
     def __init__(self):
         pass
 
+    """
+        Genera un número aleatorio entre 0 y 1000
+        :return: el número aleatorio.
+    """
     @abstractmethod
     def generarCodigoAlmacenajeMaterial() -> int:
         return random.randint(0, 1000)
 
+    
+    """
+        Genera un número aleatorio entre 1 y 3, y luego devuelve una lista de planetas en el orden de
+        el número aleatorio (InOrden, PreOrden o PostOrden)
+        
+        :param nave: la instancia de la Nave
+        :param arbolSistema: el arbol de planetas
+        :return: la lista de planetas en el orden aleatorio (InOrden, PreOrden o PostOrden)
+    """
     @abstractmethod
     def generarRecorrido(nave, arbolSistema) -> list:
         numeroRandom = random.randint(1, 3)
@@ -26,15 +41,12 @@ class Helpers:
             recorrido = arbolSistema.mostrarPostOrden(arbolSistema.getRaiz())
         return recorrido
 
-    @abstractmethod
-    def volver(puntero, canvas):
-        if puntero == "puntero":
-            canvas.moveto(puntero, 0, 0)
-        if puntero == "puntero2":
-            canvas.moveto(puntero, 40, 0)
-        if puntero == "puntero3":
-            canvas.moveto(puntero, 80, 0)
-
+    """
+        Resetea los valores de las naves.
+        
+        :param naves: la lista de las 3 naves
+        :param canvas: el gráfico canvas donde se muestra la aplicación
+    """
     @abstractmethod
     def reiniciarRecorridoNave(naves, canvas):
         naves[0].setCapacidadOro(0)
@@ -61,6 +73,13 @@ class Helpers:
         canvas.itemconfig("bronce", text="Bronce: 0")
         canvas.moveto("nave", 40, 20)
 
+    """
+        Se encarga de recorrer todos los planetas y ejecutar el método aumentarCantidad
+        el cuál hace que cada 10 segundos aumente 2 unidades de material
+        
+        :param canvas: el gráfico canvas donde se muestra la aplicación
+        :param arbolSistema: el arbol de planetas
+    """
     @abstractmethod
     def generarMateriales(canvas, arbolSistema):
         arbolSistema.resetLista()
@@ -68,6 +87,13 @@ class Helpers:
         for i in nodos:
             i.aumentarCantidad(canvas)
 
+    """
+        Devuelve el planeta (Nodo) identificado por el código
+        
+        :param numero: el número (Código) del planeta
+        :param arbolSistema: el arbol de planetas
+        :return: el Nodo del planeta
+    """
     @abstractmethod
     def getNodoPorCodigo(numero, arbolSistema):
         arbolSistema.resetLista()
@@ -77,6 +103,13 @@ class Helpers:
                 return i
         return None
 
+    """
+        Devuelve el planeta (Nodo) identificado por el nombre
+        
+        :param nombre: el nombre del planeta
+        :param arbolSistema: el arbol de planetas
+        :return: el Nodo del planeta
+    """
     @abstractmethod
     def getNodoPorNombre(nombre, arbolSistema):
         arbolSistema.resetLista()
@@ -86,13 +119,20 @@ class Helpers:
                 return i
         return None
 
+    """
+        Dibuja el árbol de planetas en el gráfico canvas 
+        con sus respectivos planetas y sus conexiones
+        y los datos referentes a cada uno
+
+        También dibuja datos extras como la información de la nave actual
+        y la cantidad de material que tiene cada nave además de la cantidad de materiales 
+        en el almacén y número de nodos en el árbol de materiales
+        
+        :param canvas: el gráfico canvas donde se muestra la aplicación
+        :param arbolSistema: el arból de planetas
+    """
     @abstractmethod
     def mostrarArbol(canvas, arbolSistema):
-        # canvas.delete("oro")
-        # canvas.delete("plata")
-        # canvas.delete("bronce")
-        # canvas.delete("unidadesAlmacen")
-        # canvas.delete("nodosArbolMateriales")
 
         canvas.delete("Pluton")
         canvas.delete("Mercurio")
@@ -190,6 +230,11 @@ class Helpers:
                     tags=["linea"]
                 )
 
+    """
+        Toma el arbol de materiales y lo muestra en una nueva ventana y en un nuevo gráfico canvas
+        
+        :param arbolMateriales: el arbol de materiales
+    """
     def mostrarArbolMateriales(arbolMateriales):
         arbolMateriales.resetLista()
         materiales = arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz())

@@ -52,6 +52,15 @@ class Nave:
     def resetRecorrido(self):
         self.recorrido = []
 
+    """
+        Recibe el arbol de planetas y llamada a la función generarRecorrido() de la clase Helpers
+        para generar un recorrido aleatorio para la nave.
+
+        Es el recorrido que la nave debe realizar para recoger el material de los planetas.
+        
+        :param arbolSistema: el arbol de planetas
+        :return: la lista de planetas en el orden aleatorio (InOrden, PreOrden o PostOrden)
+    """
     def cambiarRecorrido(self, arbolSistema):
         self.recorrido = []
         self.recorrido = Helpers.generarRecorrido(self, arbolSistema)

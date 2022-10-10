@@ -103,8 +103,6 @@ class Arbol:
 
     def eliminarHoja(self, temp, nodo):
         if temp.getDato() == nodo.getDato():
-            # print("hojaaaa")
-            #! si es hoja retorna True
             if temp.getIzquierda() == None and temp.getDerecha() == None:
                 return True
 
@@ -121,9 +119,7 @@ class Arbol:
     def eliminarNodoConHijo(self, temp, nodo):
         if temp != None:
             if temp.getDato() == nodo.getDato():
-                # Si tiene nodo con hijo
-                # Izquierda = 1
-                # Derecha = 2
+               
                 if temp.getIzquierda() != None or temp.getDerecha() != None:
                     if temp.getIzquierda() != None:
                         return 1
@@ -131,7 +127,6 @@ class Arbol:
                         return 2
 
             if nodo.getDato() < temp.getDato():
-                # Tiene nodo con hijo a la izquierda
                 if self.eliminarNodoConHijo(temp.getIzquierda(), nodo) == 1:
                     temp.setIzquierda(temp.getIzquierda().getIzquierda())
                 if self.eliminarNodoConHijo(temp.getIzquierda(), nodo) == 2:
@@ -162,7 +157,6 @@ class Arbol:
                 Padre.setCantidad(datop.getCantidad())
                 Padre.setVecesVisitadoDos(datop.getVecesVisitado())
                 Padre.setMaterial(datop.getMaterial())
-                #!__
                 return True
 
         if nodo.getDato() < Padre.getDato():
