@@ -132,7 +132,7 @@ def almacenarMaterial(tipoMaterial, cantidad):
 def finalizarRecorrido(naveActual, tarea):
     Helpers.reiniciarRecorridoNave(naves, canvas)
     naveActual.cambiarRecorrido(arbolSistema)
-    canvas.after_cancel(tarea)
+    canvas.after_cancel(tarea) # Cancela la tarea programada para la nave BREAK
 
 
 """
@@ -271,6 +271,7 @@ def recolectar(cont, lista, length, naveActual):
         "fecha": datetime.now(),
     }
 
+    # CUANDO SE LLENA LA NAVE
     if restantesOro == 0:
         print(">> La nave se devolvió, esperando el despacho de otra nave...")
         guardarMaterialEnAlmacen(recoleccion)
@@ -286,12 +287,11 @@ def recolectar(cont, lista, length, naveActual):
         guardarMaterialEnAlmacen(recoleccion)
         finalizarRecorrido(naveActual, tarea)
 
+    # CUANDO SE RECORRE TODA LA RUTA (NO SE LLENA LA NAVE)
     if cont == length:
         print(">> La nave se devolvió, esperando el despacho de otra nave...")
         guardarMaterialEnAlmacen(recoleccion)
-        canvas.moveto("nave", 40, 20)
-        canvas.after_cancel(tarea)
-        Helpers.reiniciarRecorridoNave(naves, canvas)
+        finalizarRecorrido(naveActual, tarea)
 
 
 """
@@ -301,9 +301,9 @@ def recolectar(cont, lista, length, naveActual):
 """
 def eliminarPlaneta(nombrePlaneta):
     planeta = Helpers.getNodoPorNombre(nombrePlaneta, arbolSistema)
-    print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
+    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
     arbolSistema.eliminarNodo(planeta)
-    print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
+    # print(arbolSistema.cantidadNodos(arbolSistema.getRaiz()))
     
     arbolSistema.resetLista()
     Helpers.mostrarArbol(canvas, arbolSistema)
@@ -336,7 +336,7 @@ def mostrarPlanetasVisitados():
 
         root.mainloop()   
     else:
-        print("no se puede, eliminar hay naves en recorrido")
+        print("no se puede eliminar, hay naves en recorrido")
 
 """ Crea la ventana principal de la aplicación, añade el menú, los botones y el Gráfico canvas."""
 # Ventana
