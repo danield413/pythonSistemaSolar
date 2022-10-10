@@ -75,18 +75,6 @@ def generarSistema():
     naves[1].cambiarRecorrido(arbolSistema)
     naves[2].cambiarRecorrido(arbolSistema)
 
-
-
-"""
-    Crea un Hilo donde se ejecuta la recoleccion de materiales
-    El hilo permite ejecutar la recoleccion de materiales en paralelo
-"""
-def enviarNaves():
-    proceso1 = empezarARecolectar()
-    hilo1 = threading.Thread(name="HiloNave1", target=proceso1)
-    hilo1.start()
-
-
 """
     Toma un diccionario de materiales resultado de la recolección de una nave, 
     los añade al almacén, y si el almacén tiene más de 30 unidades de cualquier material, 
@@ -122,7 +110,6 @@ def guardarMaterialEnAlmacen(recoleccion):
     canvas.itemconfig("nodosArbolMateriales", text=textoNodos)
 
 
-
 """
     Crea un nuevo Nodo en el arbol de materiales
 
@@ -148,6 +135,15 @@ def finalizarRecorrido(naveActual, tarea):
     canvas.after_cancel(tarea)
 
 
+"""
+    Crea un Hilo donde se ejecuta la recoleccion de materiales
+    El hilo permite ejecutar la recoleccion de materiales en paralelo
+"""
+def enviarNaves():
+    proceso1 = empezarARecolectar()
+    hilo1 = threading.Thread(name="HiloNave1", target=proceso1)
+    hilo1.start()
+
 
 """
     Se encarga de seleccionar una nave aleatoria que esté disponible para realizar un recorrido
@@ -164,9 +160,9 @@ def empezarARecolectar():
         canvas.after(30000, empezarARecolectar)
 
 
-
 """
     Si la nave no está en viaje ejecuta la función recolectar.
+    al llamar la funcion recolectar se genera un nuevo recorrido para la nave.
 
     :param cont: un contador para saber en que nodo de la ruta se encuentra la nave.
     :param naveActual: la instancia de la Nave que hará el recorrido
