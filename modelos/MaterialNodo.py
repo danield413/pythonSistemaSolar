@@ -15,6 +15,18 @@ class MaterialNodo:
         self.textX = 0
         self.textColor = "white"
 
+    def setDato(self, valor):
+        self.codigo = valor
+
+    def setFecha(self, valor):
+        self.fecha = valor
+
+    def setMaterial(self, valor):
+        self.tipoMaterial = valor
+
+    def getFecha(self):
+        return self.fecha
+
     def getTextColor(self):
         return self.textColor
 
@@ -70,7 +82,7 @@ class MaterialNodo:
         return self.nombre
 
     def getMaterial(self):
-        return self.material
+        return self.tipoMaterial
 
     def getCantidad(self):
         return self.cantidad

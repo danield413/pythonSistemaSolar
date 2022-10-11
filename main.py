@@ -37,7 +37,7 @@ planetas = JSON.leerJSON("./data/planetas.json")
 """
 def verArbolMateriales():
     if(arbolMateriales.getRaiz() != None):
-        Helpers.mostrarArbolMateriales(arbolMateriales)
+        Helpers.crearInterfazArbolMateriales(arbolMateriales, canvas)
     else:
         print("No hay materiales almacenados")
 
@@ -158,7 +158,6 @@ def empezarARecolectar():
         canvas.itemconfig("naveActual", text=texto)
         print(">> Despacho: ", texto)
         canvas.after(30000, empezarARecolectar)
-
 
 """
     Si la nave no está en viaje ejecuta la función recolectar.

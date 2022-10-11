@@ -3,12 +3,27 @@ import random
 from tkinter import *
 from PIL import Image, ImageTk
 import tkinter as tk
+from tkinter import ttk
 
 
 """ Clase Helpers que ayuda a la reutilización de código """
 class Helpers:
     def __init__(self):
         pass
+
+    """
+        Retorna el nodo del arbol de materiales que tenga el codigo que se le pasa por parametro
+        
+        :param arbolMateriales: el arbol de materiales
+        :param codigo: el codigoAsignado del material
+        :return: el nodo del arbol de materiales 
+    """
+    def getNodoMaterialPorCodigo(arbolMateriales, codigo):
+        arbolMateriales.resetLista()
+        for nodo in arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz()):
+            if nodo.getDato() == codigo:
+                return nodo
+        return None
 
     """
         Genera un número aleatorio entre 0 y 1000
@@ -235,21 +250,16 @@ class Helpers:
         
         :param arbolMateriales: el arbol de materiales
     """
-    def mostrarArbolMateriales(arbolMateriales):
-        arbolMateriales.resetLista()
-        materiales = arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz())
-        ventanados = Tk()
-        ventanados.geometry("600x600")
-        ventanados.title("Arbol de materiales")
-        canvasdos = Canvas(ventanados, width=550, height=600, bg="black")
-        canvasdos.pack(expand=YES)
+    def mostrarArbolMateriales(materiales, canvasdos):
+        print(">>>>>>>>>> Mostrar arbol de materiales")
+        canvasdos.delete("all")
 
         for i in materiales:
             canvasdos.create_oval(
-                i.getX(), i.getY(), i.getX2(), i.getY2(), fill=i.getColor()
+                i.getX(), i.getY(), i.getX2(), i.getY2(), fill=i.getColor(), tags=["nodomaterial"]
             )
             canvasdos.create_text(
-                i.getTextX(), i.getY2() + 15, text=i.getDato(), fill=i.getTextColor()
+                i.getTextX(), i.getY2() + 15, text=i.getDato(), fill=i.getTextColor(), tags=["textomaterial"]
             )
 
         for i in materiales:
@@ -261,7 +271,7 @@ class Helpers:
                     i.getIzquierda().getY() + 15,
                     fill="red",
                     width=2,
-                    tags=["linea"]
+                    tags=["lineamaterial"]
                 )
             if i.getDerecha():
                 canvasdos.create_line(
@@ -271,7 +281,138 @@ class Helpers:
                     i.getDerecha().getY() + 15,
                     fill="blue",
                     width=2,
-                    tags=["linea"]
+                    tags=["lineamaterial"]
                 )
+    
+    """
+        Crea una ventana con un cuadro de texto y un botón. Cuando se pulsa el botón, se busca en el
+        árbol el valor del cuadro de texto y muestra el resultado en la ventana
+        
+        :param arbolMateriales: el arbol de materiales
+        """
+    def buscarEnArbolMateriales(arbolMateriales):
+
+        def buscar(entrada, ventana):
+            nodo = Helpers.getNodoMaterialPorCodigo(arbolMateriales, int(entrada.get()))
+
+            if(nodo != None):
+                Label(ventana, text="Código asignado: " + str( nodo.getDato()) ).grid(row=1, column=0)
+                Label(ventana, text="Material: " + str( nodo.getMaterial()) ).grid(row=2, column=0)
+                Label(ventana, text="Cantidad: " + str( nodo.getCantidad()) ).grid(row=3, column=0)
+                Label(ventana, text="Fecha: " + str( nodo.getFecha()) ).grid(row=4, column=0)
+
+                arbolMateriales.resetLista()
+            else:
+                print("No se encontró el nodo.")
+
+        root = Tk()
+        root.title("Buscar en el árbol de materiales")
+        root.geometry("400x200")
+        codigo = tk.Entry()
+
+        frame = Frame(root)
+        frame.grid(row=0, column=0, padx=5, pady=5)
+
+        label = Label(frame, text="Ingrese el código asignado del material que busca")
+        label.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+
+        entrada = Entry(frame, width=30, textvariable=codigo)
+        entrada.grid(row=2, column=0, sticky="w", padx=5, pady=5)
+
+        botonSubmit = Button(
+            frame,
+            text="Buscar",
+            command=lambda: buscar(entrada, root)
+        )
+
+        botonSubmit.grid(row=2, column=1, sticky="e", padx=5, pady=5)
+
+        root.mainloop()
+
+
+    """
+        Elimina un nodo del árbol de materiales
+        
+        :param arbolMateriales: el arból de materiales
+        :param nodo: el nodo a eliminar
+        :param canvasdos: el canvas donde se muestra el árbol de materiales
+        :param canvasPrincipal: el canvas donde se muestra el árbol de sistema
+    """
+    def eliminar(arbolMateriales, nodo, canvasdos, canvasPrincipal):
+        nodo = Helpers.getNodoMaterialPorCodigo(arbolMateriales, int(nodo))
+        print(arbolMateriales.cantidadNodos(arbolMateriales.getRaiz()))
+        arbolMateriales.eliminarNodo(nodo)
+        print(arbolMateriales.cantidadNodos(arbolMateriales.getRaiz()))
+
+        arbolMateriales.resetLista()
+        Helpers.mostrarArbolMateriales(arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz()), canvasdos)
+        textoNodos = "Arb Mat. Nodos: " + str(
+        arbolMateriales.cantidadNodos(arbolMateriales.getRaiz()))
+        canvasPrincipal.itemconfig("nodosArbolMateriales", text=textoNodos)
+
+
+    """
+        Crea una ventana con un cuadro de texto y un botón. Cuando se pulsa el botón, se busca en el
+        árbol el valor del cuadro de texto y muestra el arbol actualizado
+        
+        :param arbolMateriales: el arbol de materiales
+        :param canvasdos: el canvas donde se muestra el arbol de materiales
+        :param canvasPrincipal: el canvas donde se muestra el arbol del sistema
+    """
+    def eliminarNodoArbolMateriales(arbolMateriales, canvasdos, canvasPrincipal):
+        root = Tk()
+        root.title("Eliminar Nodo")
+        root.geometry("400x200")
+
+        labels = []
+        arbolMateriales.resetLista()
+        for i in arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz()):
+            if i.getDato() not in labels:
+                labels.append(i.getDato())
+
+
+        l1 = Label(root, text="Seleccione el nodo de material que desea eliminar: ")
+        l1.pack()
+
+        lista_desplegable = ttk.Combobox(root, width=20)
+        lista_desplegable["values"] = labels
+        lista_desplegable.pack()
+
+        Button(root, text="eliminar", command=lambda: Helpers.eliminar(arbolMateriales, lista_desplegable.get(), canvasdos, canvasPrincipal)).pack()
+
+        root.mainloop()   
+        
+
+    """
+        Crea una ventana con un menu (eliminar y buscar) y muestra el arbol del sistema
+        
+        :param arbolMateriales: el arbol de materiales
+        :param canvasPrincipal: el canvas donde se muestra el arbol del sistema
+    """
+    @abstractmethod
+    def crearInterfazArbolMateriales(arbolMateriales, canvasPrincipal):
+        arbolMateriales.resetLista()
+        materiales = arbolMateriales.mostrarInOrden(arbolMateriales.getRaiz())
+        ventanados = Tk()
+        ventanados.geometry("600x600")
+        ventanados.title("Arbol de materiales")
+        canvasdos = Canvas(ventanados, width=550, height=600, bg="black")
+        canvasdos.pack(expand=YES)
+
+        barraMenu = Menu(ventanados)
+        mnuBuscar = Button(barraMenu)
+        mnuEliminar = Button(barraMenu)
+
+        barraMenu.add_cascade(
+            label="Buscar", menu=mnuBuscar, command=lambda: Helpers.buscarEnArbolMateriales(arbolMateriales)
+        )
+        barraMenu.add_cascade(
+            label="Eliminar", menu=mnuEliminar, command=lambda: Helpers.eliminarNodoArbolMateriales(arbolMateriales, canvasdos, canvasPrincipal)
+        )
+
+        ventanados.config(menu=barraMenu)
+
+        #carga los datos del arbol de materiales en el canvas
+        Helpers.mostrarArbolMateriales(materiales, canvasdos)
 
         mainloop()
