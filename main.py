@@ -15,7 +15,12 @@ from modelos.MaterialNodo import MaterialNodo
 from modelos.Nave import Nave
 from modelos.Nodo import Nodo
 
-
+"""
+    ? Estructuras de Datos - 2022-2 - Arboles Binarios ABB (Árboles de Búsqueda Binaria)
+    * Daniel Alberto Díaz Castro
+    * David Rincon Toro
+    * Jhonatan David Gómez Castaño
+"""
 
 """ Crea las instancias del arbol de planetas, del arbol de materiales y del almacen 
     Crea las instancias de las naves
